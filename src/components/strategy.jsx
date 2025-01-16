@@ -1,153 +1,9 @@
 import { useStore } from '../store/main';
-import { Box, Center, Flex, Heading, Spacer, Link as UILink, VStack } from '@chakra-ui/react';
+import { Box, Flex, Heading, Spacer, Link as UILink } from '@chakra-ui/react';
 import { Link, useParams } from 'react-router-dom';
-import { Chart } from './ui/chart';
-import { StrategyValueRuler } from './strategy-value-ruler';
-import { DateTime, Interval } from 'luxon';
-import { StrategyValueScenarios } from './strategy-value-scenarios';
-
-const options = {
-  chart: {
-    stacked: true,
-  },
-  plotOptions: {
-    bar: {
-      horizontal: false,
-      columnWidth: '55%',
-      borderRadius: 5,
-      borderRadiusApplication: 'end',
-    },
-  },
-  dataLabels: {
-    enabled: false,
-  },
-  stroke: {
-    show: true,
-    width: 2,
-    colors: ['transparent'],
-  },
-  xaxis: {
-    categories: ['D0', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'D10', 'D11', 'D12', 'D13', 'D14', 'D15', 'D16', 'D17', 'D18', 'D19', 'D20', 'D21', 'D22', 'D23', 'D24', 'D25', 'D26', 'D27', 'D28', 'D29'],
-  },
-  yaxis: {
-    title: {
-      text: 'USD',
-    },
-  },
-  fill: {
-    opacity: 1,
-  },
-  tooltip: {
-    y: {
-      formatter: function (val) {
-        return `${val} USD`;
-      },
-    },
-  },
-};
-
-const series = [
-  {
-    name: 'Premium',
-    data: [3500, 3500, 3500, 3500, 3500, 3500, 3500, 3500, 3500, 3500, 3500, 3500, 3500, 3500, 3500, 3500, 3500, 3500, 3500, 3500, 3500, 3500, 3500, 3500, 3500, 3500, 3500, 3500, 3500, 3500],
-  },
-  {
-    name: 'Capped Gain',
-    data: [340, 375, 1300, 250, 325, 450, 650, 750, 350, 750, 340, 375, 300, 250, 325, 450, 650, 650, 350, 1750, 340, 375, 300, 250, 325, 450, 650, 650, 350, 750],
-  },
-  {
-    name: 'Income',
-    data: [1578, 1578, 1578, 1578, 1578, 1578, 1578, 1578, 1578, 1578, 1578, 1578, 1578, 1578, 1578, 1578, 1578, 1578, 1578, 1578, 1578, 1578, 1578, 1578, 1578, 1578, 1578, 1578, 1578, 1578],
-  },
-  {
-    name: 'Uncaped Dividend Gain',
-    data: [450, 350, 250, 650, 450, 475, 785, 350, 786, 850, 450, 350, 250, 650, 450, 475, 785, 350, 786, 850, 450, 350, 250, 650, 450, 475, 785, 350, 786, 850],
-  },
-];
-
-const usdCurrency = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-});
-
-const usdCurrency0 = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-  maximumFractionDigits: 0,
-});
-
-const percentFormat = new Intl.NumberFormat('en-US', {
-  style: 'percent',
-  minimumFractionDigits: 2,
-});
-
-function Metric({ label, value, delta, deltaRatio, positive, neutral, lastUpdate, footerNote, secondaryValue, category }) {
-  function computeBgColor() {
-    if (neutral) {
-      return 'gray.800';
-    } else {
-      return positive ? 'green.700' : 'red.700';
-    }
-  }
-
-  function computeDeltaColor() {
-    if (neutral) {
-      return 'white';
-    } else {
-      return positive ? 'green.400' : 'red.300';
-    }
-  }
-
-  function computeValueColor() {
-    if (neutral) {
-      return 'white';
-    } else {
-      return positive ? 'green.400' : 'red.300';
-    }
-  }
-
-  return (
-    <Flex flexDir="column" flexShrink={1} p={2} mx={1} bg={computeBgColor()} borderRadius="md" minW="3xs">
-      {category && (
-        <Box as="span" maxW="min" bg="blackAlpha.200" borderRadius="sm" fontSize="xs" color={computeValueColor()} px={2}>
-          {category}
-        </Box>
-      )}
-      <Center pt={5} as="span" color={computeValueColor()} fontSize="3xl" fontWeight="bold" flexGrow={1}>
-        {value}
-        {secondaryValue && (
-          <Box as="span" fontSize="md" ml={1} mt={0.5} fontWeight="light">
-            {secondaryValue}
-          </Box>
-        )}
-      </Center>
-      {delta && (
-        <Center pb={5} as="span" color={computeDeltaColor()} fontSize="sm" fontWeight="light">
-          {delta}{' '}
-          {deltaRatio && (
-            <Box ml={3} as="span">
-              ({deltaRatio})
-            </Box>
-          )}
-        </Center>
-      )}
-      <Spacer />
-      <Center borderTopRadius="md" bg="blackAlpha.300" p={1} color="gray.100">
-        {label}
-      </Center>
-      {lastUpdate && (
-        <Center color="gray.300" borderBottomRadius="md" fontSize="xs" bg="blackAlpha.300" p={1}>
-          {DateTime.fromJSDate(lastUpdate).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS)}
-        </Center>
-      )}
-      {footerNote && (
-        <Center color="gray.300" borderBottomRadius="md" fontSize="xs" bg="blackAlpha.300" p={1}>
-          {footerNote}
-        </Center>
-      )}
-    </Flex>
-  );
-}
+import { DateTime } from 'luxon';
+import { usdCurrency, usdCurrency0, percentFormat } from './utils/formats';
+import { Metric } from './ui/metric';
 
 export function Strategy() {
   const params = useParams();
@@ -165,8 +21,8 @@ export function Strategy() {
           &lt; Home
         </UILink>
       </Flex>
-      <Flex flexDir="column" py={3}>
-        <Flex p={5} justify="center">
+      <Flex flexDir="column" py={1}>
+        <Flex py={1} justify="center">
           <Metric
             category="market"
             label={`${strategy.growth.symbol} UNIT PRICE`}
@@ -196,7 +52,7 @@ export function Strategy() {
             lastUpdate={lastUpdate}
           />
         </Flex>
-        <Flex p={5} justify="center">
+        <Flex py={1} justify="center">
           <Metric
             category="balance"
             label={`${strategy.growth.units} ${strategy.growth.symbol} @ ${usdCurrency.format(strategy.growth.cost)}`}
@@ -225,7 +81,7 @@ export function Strategy() {
             lastUpdate={lastUpdate}
           />
         </Flex>
-        <Flex px={5} py={3} justify="center">
+        <Flex px={5} py={1} justify="center">
           <Metric
             category="income"
             label="CASH VALUE"
@@ -246,7 +102,7 @@ export function Strategy() {
           />
           <Metric label="EXPIRATION" category="cycle" delta={`${strategy.option.dte} days`} deltaRatio={strategy.option.inTheMoney ? 'ITM' : 'OTM'} positive={!strategy.option.inTheMoney} value={strategy.option.expiration} />
         </Flex>
-        <Flex p={5} justify="center">
+        <Flex py={1} justify="center">
           <Metric
             category="outcome"
             label="BUY BACK"
