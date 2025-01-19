@@ -3,7 +3,7 @@ import { immer } from 'zustand/middleware/immer';
 
 export const useStore = create(
   immer((set) => ({
-    strategies: [],
+    activeCycles: {},
     dispatch(action) {
       switch (action.type) {
         case 'sync':
